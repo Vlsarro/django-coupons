@@ -17,8 +17,8 @@ from .settings import (
     SEGMENT_SEPARATOR,
 )
 
-
-redeem_done = Signal(providing_args=["coupon"])
+# Provides the "coupon" argument
+redeem_done = Signal()
 
 
 class CouponManager(models.Manager):
