@@ -22,7 +22,17 @@ redeem_done = Signal(providing_args=["coupon"])
 
 
 class CouponManager(models.Manager):
-    def create_coupon(self, type, value, users=[], valid_until=None, prefix="", campaign=None, user_limit=None):
+    def create_coupon(
+        self,
+        type,
+        value,
+        users=None,
+        valid_until=None,
+        prefix="",
+        campaign=None,
+        user_limit=None,
+    ):
+        users = users or []
         coupon = self.create(
             value=value,
             code=Coupon.generate_code(prefix),
@@ -36,7 +46,9 @@ class CouponManager(models.Manager):
             coupon.save()
         except IntegrityError:
             # Try again with other code
-            coupon = Coupon.objects.create_coupon(type, value, users, valid_until, prefix, campaign)
+            coupon = Coupon.objects.create_coupon(
+                type, value, users, valid_until, prefix, campaign
+            )
         if not isinstance(users, list):
             users = [users]
         for user in users:
@@ -44,10 +56,14 @@ class CouponManager(models.Manager):
                 CouponUser(user=user, coupon=coupon).save()
         return coupon
 
-    def create_coupons(self, quantity, type, value, valid_until=None, prefix="", campaign=None):
+    def create_coupons(
+        self, quantity, type, value, valid_until=None, prefix="", campaign=None
+    ):
         coupons = []
         for i in range(quantity):
-            coupons.append(self.create_coupon(type, value, None, valid_until, prefix, campaign))
+            coupons.append(
+                self.create_coupon(type, value, None, valid_until, prefix, campaign)
+            )
         return coupons
 
     def used(self):
@@ -63,20 +79,34 @@ class CouponManager(models.Manager):
 class Coupon(models.Model):
     value = models.IntegerField(_("Value"), help_text=_("Arbitrary coupon value"))
     code = models.CharField(
-        _("Code"), max_length=30, unique=True, blank=True,
-        help_text=_("Leaving this field empty will generate a random code."))
+        _("Code"),
+        max_length=30,
+        unique=True,
+        blank=True,
+        help_text=_("Leaving this field empty will generate a random code."),
+    )
     type = models.CharField(_("Type"), max_length=20, choices=COUPON_TYPES)
     user_limit = models.PositiveIntegerField(_("User limit"), default=1)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     valid_until = models.DateTimeField(
-        _("Valid until"), blank=True, null=True,
-        help_text=_("Leave empty for coupons that never expire"))
-    campaign = models.ForeignKey('Campaign', verbose_name=_("Campaign"), on_delete=CASCADE, blank=True, null=True, related_name='coupons')
+        _("Valid until"),
+        blank=True,
+        null=True,
+        help_text=_("Leave empty for coupons that never expire"),
+    )
+    campaign = models.ForeignKey(
+        "Campaign",
+        verbose_name=_("Campaign"),
+        on_delete=CASCADE,
+        blank=True,
+        null=True,
+        related_name="coupons",
+    )
 
     objects = CouponManager()
 
     class Meta:
-        ordering = ['created_at']
+        ordering = ["created_at"]
         verbose_name = _("Coupon")
         verbose_name_plural = _("Coupons")
 
@@ -93,15 +123,21 @@ class Coupon(models.Model):
 
     @property
     def is_redeemed(self):
-        """ Returns true is a coupon is redeemed (completely for all users) otherwise returns false. """
-        return self.users.filter(
-            redeemed_at__isnull=False
-        ).count() >= self.user_limit and self.user_limit is not 0
+        """Returns true is a coupon is redeemed (completely for all users) otherwise returns false."""
+        return (
+            self.users.filter(redeemed_at__isnull=False).count() >= self.user_limit
+            and self.user_limit is not 0
+        )
 
     @property
     def redeemed_at(self):
         try:
-            return self.users.filter(redeemed_at__isnull=False).order_by('redeemed_at').last().redeemed_at
+            return (
+                self.users.filter(redeemed_at__isnull=False)
+                .order_by("redeemed_at")
+                .last()
+                .redeemed_at
+            )
         except self.users.through.DoesNotExist:
             return None
 
@@ -109,7 +145,12 @@ class Coupon(models.Model):
     def generate_code(cls, prefix="", segmented=SEGMENTED_CODES):
         code = "".join(random.choice(CODE_CHARS) for i in range(CODE_LENGTH))
         if segmented:
-            code = SEGMENT_SEPARATOR.join([code[i:i + SEGMENT_LENGTH] for i in range(0, len(code), SEGMENT_LENGTH)])
+            code = SEGMENT_SEPARATOR.join(
+                [
+                    code[i : i + SEGMENT_LENGTH]
+                    for i in range(0, len(code), SEGMENT_LENGTH)
+                ]
+            )
             return prefix + code
         else:
             return prefix + code
@@ -133,7 +174,7 @@ class Campaign(models.Model):
     description = models.TextField(_("Description"), blank=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
         verbose_name = _("Campaign")
         verbose_name_plural = _("Campaigns")
 
@@ -142,12 +183,18 @@ class Campaign(models.Model):
 
 
 class CouponUser(models.Model):
-    coupon = models.ForeignKey(Coupon, on_delete=CASCADE, related_name='users')
-    user = models.ForeignKey(get_user_model(), verbose_name=_("User"), on_delete=CASCADE, null=True, blank=True)
+    coupon = models.ForeignKey(Coupon, on_delete=CASCADE, related_name="users")
+    user = models.ForeignKey(
+        get_user_model(),
+        verbose_name=_("User"),
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+    )
     redeemed_at = models.DateTimeField(_("Redeemed at"), blank=True, null=True)
 
     class Meta:
-        unique_together = (('coupon', 'user'),)
+        unique_together = (("coupon", "user"),)
 
     def __str__(self):
         return str(self.user)

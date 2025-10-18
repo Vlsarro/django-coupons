@@ -15,47 +15,147 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Campaign',
+            name="Campaign",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, unique=True, verbose_name='Name')),
-                ('description', models.TextField(blank=True, verbose_name='Description')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(max_length=255, unique=True, verbose_name="Name"),
+                ),
+                (
+                    "description",
+                    models.TextField(blank=True, verbose_name="Description"),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Campaigns',
-                'verbose_name': 'Campaign',
-                'ordering': ['name'],
+                "verbose_name_plural": "Campaigns",
+                "verbose_name": "Campaign",
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='Coupon',
+            name="Coupon",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('value', models.IntegerField(help_text='Arbitrary coupon value', verbose_name='Value')),
-                ('code', models.CharField(blank=True, help_text='Leaving this field empty will generate a random code.', max_length=30, unique=True, verbose_name='Code')),
-                ('type', models.CharField(choices=[('monetary', 'Money based coupon'), ('percentage', 'Percentage discount'), ('virtual_currency', 'Virtual currency')], max_length=20, verbose_name='Type')),
-                ('user_limit', models.PositiveIntegerField(default=1, verbose_name='User limit')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Created at')),
-                ('valid_until', models.DateTimeField(blank=True, help_text='Leave empty for coupons that never expire', null=True, verbose_name='Valid until')),
-                ('campaign', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='coupons', to='coupons.Campaign', verbose_name='Campaign')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "value",
+                    models.IntegerField(
+                        help_text="Arbitrary coupon value", verbose_name="Value"
+                    ),
+                ),
+                (
+                    "code",
+                    models.CharField(
+                        blank=True,
+                        help_text="Leaving this field empty will generate a random code.",
+                        max_length=30,
+                        unique=True,
+                        verbose_name="Code",
+                    ),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[
+                            ("monetary", "Money based coupon"),
+                            ("percentage", "Percentage discount"),
+                            ("virtual_currency", "Virtual currency"),
+                        ],
+                        max_length=20,
+                        verbose_name="Type",
+                    ),
+                ),
+                (
+                    "user_limit",
+                    models.PositiveIntegerField(default=1, verbose_name="User limit"),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="Created at"),
+                ),
+                (
+                    "valid_until",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="Leave empty for coupons that never expire",
+                        null=True,
+                        verbose_name="Valid until",
+                    ),
+                ),
+                (
+                    "campaign",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="coupons",
+                        to="coupons.Campaign",
+                        verbose_name="Campaign",
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Coupons',
-                'verbose_name': 'Coupon',
-                'ordering': ['created_at'],
+                "verbose_name_plural": "Coupons",
+                "verbose_name": "Coupon",
+                "ordering": ["created_at"],
             },
         ),
         migrations.CreateModel(
-            name='CouponUser',
+            name="CouponUser",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('redeemed_at', models.DateTimeField(blank=True, null=True, verbose_name='Redeemed at')),
-                ('coupon', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='users', to='coupons.Coupon')),
-                ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='User')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "redeemed_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Redeemed at"
+                    ),
+                ),
+                (
+                    "coupon",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="users",
+                        to="coupons.Coupon",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="User",
+                    ),
+                ),
             ],
         ),
         migrations.AlterUniqueTogether(
-            name='couponuser',
-            unique_together={('coupon', 'user')},
+            name="couponuser",
+            unique_together={("coupon", "user")},
         ),
     ]

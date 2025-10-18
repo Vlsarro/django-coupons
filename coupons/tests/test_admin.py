@@ -20,11 +20,14 @@ class CouponAdminTestCase(TestCase):
     def setUp(self):
         self.site = AdminSite()
 
-    @skipIf(StrictVersion(django.get_version()) < StrictVersion('1.7'), "Skip list display test due to missing method.")
+    @skipIf(
+        StrictVersion(django.get_version()) < StrictVersion("1.7"),
+        "Skip list display test due to missing method.",
+    )
     def test_list_display(self):
         admin = CouponAdmin(Coupon, self.site)
 
         self.assertEquals(
             list(admin.get_fields(request)),
-            ['value', 'code', 'type', 'user_limit', 'valid_until', 'campaign']
+            ["value", "code", "type", "user_limit", "valid_until", "campaign"],
         )
