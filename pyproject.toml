@@ -11,4 +11,5 @@ dependencies = [
 [dependency-groups]
 dev = [
     "coverage>=7.6.1",
+    "packaging>=25.0",
 ]

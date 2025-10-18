@@ -29,3 +29,8 @@ The difference is defined by the number of possible redeems and if they are boun
     3) limit number, coupon can be used a limited number of times, by any user once.
     4) users list, coupon can be used by a defined list of users, each once.
     5) unlimited, coupon can be used unlimited times, but only once by the same user.
+
+## Running tests
+1) Run `uv pip install -r pyproject.toml -e . --all-extras`
+2) Activate env `source .venv/bin/activate`
+3) Run tests: `django-admin test --settings=coupons.tests.settings`

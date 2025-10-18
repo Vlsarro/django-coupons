@@ -15,9 +15,9 @@ class DefaultCouponTestCase(TestCase):
     def test_redeem(self):
         self.coupon.redeem(self.user)
         self.assertTrue(self.coupon.is_redeemed)
-        self.assertEquals(self.coupon.users.count(), 1)
+        self.assertEqual(self.coupon.users.count(), 1)
         self.assertIsInstance(self.coupon.users.first().redeemed_at, datetime)
-        self.assertEquals(self.coupon.users.first().user, self.user)
+        self.assertEqual(self.coupon.users.first().user, self.user)
 
     def test_redeem_via_form(self):
         form = CouponForm(data={"code": self.coupon.code}, user=self.user)
@@ -27,9 +27,9 @@ class DefaultCouponTestCase(TestCase):
         self.coupon.redeem(self.user)
         # coupon should be redeemed properly now
         self.assertTrue(self.coupon.is_redeemed)
-        self.assertEquals(self.coupon.users.count(), 1)
+        self.assertEqual(self.coupon.users.count(), 1)
         self.assertIsInstance(self.coupon.users.first().redeemed_at, datetime)
-        self.assertEquals(self.coupon.users.first().user, self.user)
+        self.assertEqual(self.coupon.users.first().user, self.user)
         # form should be invalid after redeem
         self.assertTrue(form.is_valid())
 
@@ -41,7 +41,7 @@ class DefaultCouponTestCase(TestCase):
         self.coupon.redeem()
         # coupon should be redeemed properly now
         self.assertTrue(self.coupon.is_redeemed)
-        self.assertEquals(self.coupon.users.count(), 1)
+        self.assertEqual(self.coupon.users.count(), 1)
         self.assertIsInstance(self.coupon.users.first().redeemed_at, datetime)
         self.assertIsNone(self.coupon.users.first().user)
         # form should be invalid after redeem
@@ -54,8 +54,8 @@ class SingleUserCouponTestCase(TestCase):
         self.coupon = Coupon.objects.create_coupon("monetary", 100, self.user)
 
     def test_user_limited_coupon(self):
-        self.assertEquals(self.coupon.users.count(), 1)
-        self.assertEquals(self.coupon.users.first().user, self.user)
+        self.assertEqual(self.coupon.users.count(), 1)
+        self.assertEqual(self.coupon.users.first().user, self.user)
         # not redeemed yet
         self.assertIsNone(self.coupon.users.first().redeemed_at)
 
@@ -63,15 +63,15 @@ class SingleUserCouponTestCase(TestCase):
         self.coupon.redeem(self.user)
         # coupon should be redeemed properly now
         self.assertTrue(self.coupon.is_redeemed)
-        self.assertEquals(self.coupon.users.count(), 1)
+        self.assertEqual(self.coupon.users.count(), 1)
         self.assertIsInstance(self.coupon.users.first().redeemed_at, datetime)
-        self.assertEquals(self.coupon.users.first().user, self.user)
+        self.assertEqual(self.coupon.users.first().user, self.user)
 
     def test_form_without_user(self):
         """This should fail since the coupon is bound to an user, but we do not provide any user."""
         form = CouponForm(data={"code": self.coupon.code})
         self.assertFalse(form.is_valid())
-        self.assertEquals(
+        self.assertEqual(
             form.errors, {"code": ["This code is not valid for your account."]}
         )
 
@@ -80,7 +80,7 @@ class SingleUserCouponTestCase(TestCase):
         # try to redeem again with form
         form = CouponForm(data={"code": self.coupon.code}, user=self.user)
         self.assertFalse(form.is_valid())
-        self.assertEquals(form.errors, {"code": ["This code has already been used."]})
+        self.assertEqual(form.errors, {"code": ["This code has already been used."]})
 
 
 class UnlimitedCouponTestCase(TestCase):
@@ -93,9 +93,9 @@ class UnlimitedCouponTestCase(TestCase):
         # coupon is not redeemed since it can be used unlimited times
         self.assertFalse(self.coupon.is_redeemed)
         # coupon should be redeemed properly now
-        self.assertEquals(self.coupon.users.count(), 1)
+        self.assertEqual(self.coupon.users.count(), 1)
         self.assertIsInstance(self.coupon.users.first().redeemed_at, datetime)
-        self.assertEquals(self.coupon.users.first().user, self.user)
+        self.assertEqual(self.coupon.users.first().user, self.user)
 
     def test_redeem_with_multiple_users(self):
         for i in range(100):
@@ -107,7 +107,7 @@ class UnlimitedCouponTestCase(TestCase):
         """This should fail since we cannot track single use of a coupon without an user."""
         form = CouponForm(data={"code": self.coupon.code})
         self.assertFalse(form.is_valid())
-        self.assertEquals(
+        self.assertEqual(
             form.errors,
             {
                 "code": [
@@ -121,6 +121,6 @@ class UnlimitedCouponTestCase(TestCase):
         # try to redeem again with form
         form = CouponForm(data={"code": self.coupon.code}, user=self.user)
         self.assertFalse(form.is_valid())
-        self.assertEquals(
+        self.assertEqual(
             form.errors, {"code": ["This code has already been used by your account."]}
         )
