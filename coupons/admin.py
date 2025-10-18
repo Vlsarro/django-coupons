@@ -98,7 +98,7 @@ class CampaignAdmin(admin.ModelAdmin):
     num_coupons_used.short_description = _("used")
 
     def num_coupons_unused(self, obj):
-        return obj.coupons.used().count()
+        return obj.coupons.unused().count()
 
     num_coupons_unused.short_description = _("unused")
 
