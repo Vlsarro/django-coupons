@@ -26,12 +26,13 @@ class CouponManager(models.Manager):
         self,
         type,
         value,
-        users=[],
+        users=None,
         valid_until=None,
         prefix="",
         campaign=None,
         user_limit=None,
     ):
+        users = users or []
         coupon = self.create(
             value=value,
             code=Coupon.generate_code(prefix),
